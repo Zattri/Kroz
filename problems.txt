@@ -6,6 +6,7 @@ Objects -
 
 Items - 
   All items need to be uniquely identified by their ID number
+  We have no way of knowing if someone should lose or keep an item after an interaction
 
 Interactions - 
   
