@@ -1,0 +1,16 @@
+Location - 
+
+Objects - 
+  All objects need to be uniquely identified by their ID number
+  All objects need to start with a stateNum of 0
+
+Items - 
+  All items need to be uniquely identified by their ID number
+
+Interactions - 
+  
+
+Input - 
+  Just give me the command in a command type, and the whole object from the location
+  - Follow InputTuple example
+  Make the command for Use a tuple with the item ID in it. e.g (Use, 1)
