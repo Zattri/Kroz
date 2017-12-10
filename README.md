@@ -1,2 +1,0 @@
-# Kroz
-F# Group Coursework
