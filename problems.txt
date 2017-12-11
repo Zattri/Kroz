@@ -3,7 +3,7 @@ Location -
 
 Objects - 
   DONE - All objects need to be uniquely identified by their ID number
-  All objects need to start with a stateNum of 0 
+  All objects need to start with a stateNum of 0 - Just create defaults for each set for each Location?
 
 Items - 
   DONE - All items need to be uniquely identified by their ID number
