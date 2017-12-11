@@ -1,11 +1,12 @@
 Location - 
+  Need a list / array of locations to look through instead of just variables - Network?
 
 Objects - 
-  All objects need to be uniquely identified by their ID number
-  All objects need to start with a stateNum of 0
+  DONE - All objects need to be uniquely identified by their ID number
+  All objects need to start with a stateNum of 0 
 
 Items - 
-  All items need to be uniquely identified by their ID number
+  DONE - All items need to be uniquely identified by their ID number
   We have no way of knowing if someone should lose or keep an item after an interaction
 
 Interactions - 
