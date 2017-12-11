@@ -77,7 +77,7 @@ let updatewObjectStates (wObject:WorldObject) (newStateNum:int) (newStateString:
   {wObject with stateNum = newStateNum; stateString = newStateString}
 
 let updateLocationObjectsSet (wObject:WorldObject) (locationRecord:Location) (resultTuple:ResultTuple) = 
-  let _,newStateNum,newStateString = resultTuple
+  let (_,newStateNum,newStateString) = resultTuple
   let newObject = updatewObjectStates wObject newStateNum newStateString
   {locationRecord with objects = locationRecord.objects.Remove(wObject).Add(newObject)}
 
@@ -96,17 +96,18 @@ let checkInteractionKey (inputTuple:InputTuple) =
   [if (interactionDict.ContainsKey (fst tuples)) then
     yield interactionDict.Item(fst tuples) 
   else 
-    yield (snd tuples)].Head
-// Returns a list pls fix
+    yield (snd tuples)].Head // .Head is a bodge, any fixes?
 
 
 // Also needs player location - testLoc needs to be where the object is located / where the player is currently (should be the same)
+// - Make a function for that?
 let processCommand (inputTuple:InputTuple) = 
 let command,wObject = inputTuple
 updateLocationObjectsSet wObject testLoc (checkInteractionKey (command, wObject))
 
 
-// Testing Area
+// Testing Area - Careful, messy
+
 printfn "%A" testLoc // Location before
 processCommand (Push, obj1) // Location after
 
