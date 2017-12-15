@@ -8,6 +8,7 @@ Objects -
 Items - 
   DONE - All items need to be uniquely identified by their ID number
   We have no way of knowing if someone should lose or keep an item after an interaction
+  We need to figure out how item sets work
 
 Interactions - 
   
@@ -16,3 +17,4 @@ Input -
   Just give me the command in a command type, and the whole object from the location
   - Follow InputTuple example
   Make the command for Use a tuple with the item ID in it. e.g (Use, 1)
+   - Might need a type change
