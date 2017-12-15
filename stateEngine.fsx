@@ -83,8 +83,7 @@ let updateLocationObjectsSet (wObject:WorldObject) (locationRecord:Location) (re
 
 
 // This function is really trash - Pls refine it, maybe 2 functions nested?
-let formatInteractionAndErrorTuples (inputTuple:InputTuple) = 
-  let (command, wObject) = inputTuple
+let formatInteractionAndErrorTuples (command:Command, wObject:WorldObject) =
   let errorString = String.Format("You cannot {0} on the {1}", command, wObject.name)
   ((command, wObject.id, wObject.stateNum), (errorString, wObject.stateNum, wObject.stateString))
 
@@ -96,7 +95,10 @@ let checkInteractionKey (inputTuple:InputTuple) =
   [if (interactionDict.ContainsKey (fst tuples)) then
     yield interactionDict.Item(fst tuples) 
   else 
-    yield (snd tuples)].Head // .Head is a bodge, any fixes?
+    yield (snd tuples)].Head
+// Returns a list pls fix
+// Try using filter for if then else lines
+// Also break down the tuple in the parameter input
 
 
 // Also needs player location - testLoc needs to be where the object is located / where the player is currently (should be the same)
