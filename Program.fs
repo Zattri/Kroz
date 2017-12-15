@@ -48,25 +48,16 @@ type command = //All Commands are here
     | NotValid of string list
 
 type object = //EXAMPLE
-    |Spoon
-    |Log
-    |Nothing
+    | Chest
+    | Piller
+    | Wall
+    | Button
+    | Lever
+    | Plinth
 
         
-let validateCommand(command:string, object:string) = 
-    if command = "Use" then Use
-    elif command = "Move" then Move
-    elif command = "Help" then Help ["The sytax for this game is: command object. For example: Push Pillar. You can also use object ID's if you know them"]
-    elif command = "Hint" then Hint
-    elif command = "Rotate" then Rotate
-    elif command = "Go" then Go
-    elif command = "Search" then Search
-    elif command = "Look" then Look
-    elif command = "Open" then Open
-    elif command = "Close" then Close
-    elif command = "Push" then Push
-    elif command = "Pull" then Pull
-    else NotValid ["Please enter a valid command!"]
+//let validateCommand(command:string, object:string) = 
+    //TODO
 
 type result = 
     |Valid
@@ -74,13 +65,22 @@ type result =
 
 let (<&>) inp1 inp2 x = //Perhaps this is wrong? Need to work on this some more as only examples are used.
   match inp1 x, inp2 x with
-  | Use, Spoon -> Valid
-  | Use, Log -> Invalid ["Can't use this command on this object!"]
+  | Use, Plinth -> Valid
+  | Use, _ -> Invalid ["Can't use this command on this object!"]
+  | Move, Piller -> Valid
+  | Move, Plinth -> Valid
+  | Move, _ -> Invalid ["You can't move it object, try 'Move Pillar' or 'Move Plinth'"]
+  | Rotate, Piller -> Valid
+  | Rotate, Plinth -> Valid
+  | Rotate, _ -> Invalid ["This type of object cannot be rotated! Try using this command with another object."]
+  | Search, Chest -> Valid
+  | Search, Plinth -> Valid
+  | Search, _ -> Invalid ["You cannot search this object. Try searching another object."]
   | Help[""], _ -> Valid
   |_, _ -> Invalid ["No command specified."]
 
-let command = System.Console.ReadLine() //Takes in input for what command the user wants
-let objoritm = System.Console.ReadLine() //Takes in input for item or object the user wants to use a command on
+let command = System.Console.ReadLine().Trim().ToLower() //Takes in input for what command the user wants
+let objoritm = System.Console.ReadLine().Trim().ToLower() //Takes in input for item or object the user wants to use a command on
 
 let validate = 
     validateCommand <&> //States this is incorrect
