@@ -69,6 +69,8 @@ let testLoc = {
     objects = Set.ofList [obj1; obj2]
 }
 
+// Temp Variable - Create some sort of interface that alters the current location of the player
+let currentLocation = testLoc
 // =============================================================================================
 
 
@@ -76,8 +78,7 @@ let testLoc = {
 let updatewObjectStates (wObject:WorldObject) (newStateNum:int) (newStateString:string) = 
   {wObject with stateNum = newStateNum; stateString = newStateString}
 
-let updateLocationObjectsSet (wObject:WorldObject) (locationRecord:Location) (resultTuple:ResultTuple) = 
-  let (_,newStateNum,newStateString) = resultTuple
+let updateLocationObjectsSet (wObject:WorldObject) (locationRecord:Location) (outputText:string, newStateNum:int, newStateString:string) = 
   let newObject = updatewObjectStates wObject newStateNum newStateString
   {locationRecord with objects = locationRecord.objects.Remove(wObject).Add(newObject)}
 
@@ -90,12 +91,12 @@ let formatInteractionAndErrorTuples (command:Command, wObject:WorldObject) =
 
 // Checks the interaction array to see if the command can be applie to the given object
 let checkInteractionKey (inputTuple:InputTuple) =
-  let tuples = formatInteractionAndErrorTuples inputTuple
+  let keyTuple,errorTuple = formatInteractionAndErrorTuples inputTuple
   // Need options on returning things
-  [if (interactionDict.ContainsKey (fst tuples)) then
-    yield interactionDict.Item(fst tuples) 
+  [if (interactionDict.ContainsKey keyTuple) then
+    yield interactionDict.Item(keyTuple) 
   else 
-    yield (snd tuples)].Head
+    yield errorTuple].Head
 // Returns a list pls fix
 // Try using filter for if then else lines
 // Also break down the tuple in the parameter input
@@ -103,17 +104,16 @@ let checkInteractionKey (inputTuple:InputTuple) =
 
 // Also needs player location - testLoc needs to be where the object is located / where the player is currently (should be the same)
 // - Make a function for that?
-let processCommand (inputTuple:InputTuple) = 
-let command,wObject = inputTuple
-updateLocationObjectsSet wObject testLoc (checkInteractionKey (command, wObject))
+let processCommand (command:Command, wObject:WorldObject) = 
+  updateLocationObjectsSet wObject testLoc (checkInteractionKey (command, wObject))
 
 
 // Testing Area - Careful, messy
 
-printfn "%A" testLoc // Location before
+testLoc // Location before
 processCommand (Push, obj1) // Location after
 
-updateLocationObjectsSet obj1 testLoc (checkInteractionKey (Push, obj1))
+updateLocationObjectsSet obj1 currentLocation (checkInteractionKey (Push, obj1))
 
 checkInteractionKey (Pull, obj2)
 checkInteractionKey (Push, obj2)
@@ -128,7 +128,12 @@ Based on options update object or not
 Figure out how we want to update items
 - Update the sets in Locaton based off of this
   - Use the Set functions to update them and make new records
-- Update Location state based off of whether all objects in the set are complete or not
+Need to add a method of checking if every object in a location is complete, and update the location state
+
+FOR THE OTHERS TO WORK ON - 
+Need some user output methods that print out objects, items and information about rooms
+Need some methods that interact with the user and take in input
+
 
 GG EZ
 We Gucci
