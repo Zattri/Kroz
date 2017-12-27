@@ -1,5 +1,8 @@
 // TYPE DEFINITIONS
 open System
+open System.Security.AccessControl.NativeObjectSecurity
+open System.Xml.Xsl
+open System.Security.AccessControl
 
 type Command =
     |Use
@@ -43,8 +46,11 @@ type InputTuple = Command * WorldObject
 // Input Command * Object ID * Specific Object State For Interaction
 type InteractionTuple = Command * int * int
 
+// objectID * newStateNum * newStateString
+type ObjectUpdateTuple = int * int * string
+
 // Interaction Output String * New stateNum * new stateString
-type ResultTuple = string * int * string
+type ResultTuple = string * List<ObjectUpdateTuple>
 
 
 // =====================================================================================
@@ -54,6 +60,10 @@ type ResultTuple = string * int * string
 let interactionDict = dict[
     (Push, 1, 0), ("You have pushed the button", 4, "The button on the wall is pushed in");
     (Pull, 2, 0), ("You have pulled the lever", 4, "The lever on the wall is pulled down");
+]
+
+let newInteractionDict = dict[
+  (command, objId, stateOfObject), (resultTuple, [(ObjectUpdateTuple); (ObjectUpdateTuple)])
 ]
 
 let obj1 = {id=1; name="Button"; stateNum=0; stateString="The button is untouched"}
@@ -69,15 +79,65 @@ let testLoc = {
     objects = Set.ofList [obj1; obj2]
 }
 
-// Temp Variable - Create some sort of interface that alters the current location of the player
-let currentLocation = testLoc
+// =============================================================================================
+// Sands of Time test room 
+let sandsOfTime = {
+  name = "Sand Room";
+  state = 0;
+  items = Set.ofList [];
+  objects = Set.ofList [obj1; obj2]
+}
+
+
 // =============================================================================================
 
+// Temp Variable - Create some sort of interface that alters the current location of the player
+let currentLocation = sandsOfTime
+// =============================================================================================
+
+let objUpdateList = [(1, 3, "The lever is pulled"); (2, 3, "The button is pushed")]
+
+let rec createObjIdList objList =
+  match objList with
+  | [(id,_,_)] -> [id]
+  | (id,_,_)::xs -> id::createObjIdList xs
+
+(* THE PLAN - 
+    Want to return a new set of objects for the current location
+
+    For each item in the list return the corresponding item from the set of objects, based on the object id
+    Create a new object record with updated stateNum and stateString - ALREADY HAVE A FUNCTION
+    Remove the old object from the set and add the new object to the set - ALREADY IN A FUNCTION, TAKE IT OUT AND ADD TO HERE
+    Return the final set after iterating through the list of updated objects ends
+  *) 
+
+  
+  // Use all these elements to generate new elements from them
+  // Remove all the old elements from the set and add the new ones to the set
+let newUpdateObjectState (newObjStatsList:List<ObjectUpdateTuple>) = 
+  let objectsToUpdate = Set.filter (fun elem -> List.exists (fun (id,_,_) -> id = elem.id) newObjStatsList) currentLocation.objects
+  let newObjects = Set.empty
+  // This is broken
+  List.map (fun (id, newStateNum, newStateString) ->
+    Set.map (fun oldObject -> 
+      if (oldObject.id = id) then
+        newObjects.Add({oldObject with stateNum = newStateNum; stateString = newStateString})
+    ) objectsToUpdate
+  ) newObjStatsList
+  newObjects
+  // Iterate through the ObjStatsList and match ids to records in the set
+  // Create a new set with new records that contain the updated stats based on the old records
+  // Delete the set of old records from the location objects set
+  // Add the set of new records to the location objects set
+  
+
+newUpdateObjectState objUpdateList
 
 // Error checking for function done if error tuple is returned or not from checkInteractionKey
 let updatewObjectStates (wObject:WorldObject) (newStateNum:int) (newStateString:string) = 
   {wObject with stateNum = newStateNum; stateString = newStateString}
 
+// Alter this to always use the current location
 let updateLocationObjectsSet (wObject:WorldObject) (locationRecord:Location) (outputText:string, newStateNum:int, newStateString:string) = 
   let newObject = updatewObjectStates wObject newStateNum newStateString
   {locationRecord with objects = locationRecord.objects.Remove(wObject).Add(newObject)}
@@ -97,15 +157,11 @@ let checkInteractionKey (inputTuple:InputTuple) =
     yield interactionDict.Item(keyTuple) 
   else 
     yield errorTuple].Head
-// Returns a list pls fix
 // Try using filter for if then else lines
-// Also break down the tuple in the parameter input
 
 
-// Also needs player location - testLoc needs to be where the object is located / where the player is currently (should be the same)
-// - Make a function for that?
 let processCommand (command:Command, wObject:WorldObject) = 
-  updateLocationObjectsSet wObject testLoc (checkInteractionKey (command, wObject))
+  updateLocationObjectsSet wObject currentLocation (checkInteractionKey (command, wObject))
 
 
 // Testing Area - Careful, messy
