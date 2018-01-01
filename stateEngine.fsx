@@ -1,8 +1,5 @@
 // TYPE DEFINITIONS
 open System
-open System.Security.AccessControl.NativeObjectSecurity
-open System.Xml.Xsl
-open System.Security.AccessControl
 
 type Command =
     |Use
@@ -62,9 +59,9 @@ let interactionDict = dict[
     (Pull, 2, 0), ("You have pulled the lever", 4, "The lever on the wall is pulled down");
 ]
 
-let newInteractionDict = dict[
-  (command, objId, stateOfObject), (resultTuple, [(ObjectUpdateTuple); (ObjectUpdateTuple)])
-]
+// let newInteractionDict = dict[
+//   (command, objId, stateOfObject), (resultTuple, [(ObjectUpdateTuple); (ObjectUpdateTuple)])
+// ]
 
 let obj1 = {id=1; name="Button"; stateNum=0; stateString="The button is untouched"}
 let obj2 = {id=2; name="Lever"; stateNum=0; stateString="The lever is upright"}
@@ -95,12 +92,6 @@ let sandsOfTime = {
 let currentLocation = sandsOfTime
 // =============================================================================================
 
-let objUpdateList = [(1, 3, "The lever is pulled"); (2, 3, "The button is pushed")]
-
-let rec createObjIdList objList =
-  match objList with
-  | [(id,_,_)] -> [id]
-  | (id,_,_)::xs -> id::createObjIdList xs
 
 (* THE PLAN - 
     Want to return a new set of objects for the current location
@@ -114,17 +105,16 @@ let rec createObjIdList objList =
   
   // Use all these elements to generate new elements from them
   // Remove all the old elements from the set and add the new ones to the set
+let objUpdateList = [(1, 3, "The lever is pulled"); (2, 3, "The button is pushed")]
+
 let newUpdateObjectState (newObjStatsList:List<ObjectUpdateTuple>) = 
   let objectsToUpdate = Set.filter (fun elem -> List.exists (fun (id,_,_) -> id = elem.id) newObjStatsList) currentLocation.objects
   let newObjects = Set.empty
-  // This is broken
-  List.map (fun (id, newStateNum, newStateString) ->
-    Set.map (fun oldObject -> 
-      if (oldObject.id = id) then
-        newObjects.Add({oldObject with stateNum = newStateNum; stateString = newStateString})
-    ) objectsToUpdate
-  ) newObjStatsList
-  newObjects
+  printfn "%A" newObjStatsList
+  // How to add things to the set
+  //newObjects.Add({oldObject with stateNum = newStateNum; stateString = newStateString})
+
+
   // Iterate through the ObjStatsList and match ids to records in the set
   // Create a new set with new records that contain the updated stats based on the old records
   // Delete the set of old records from the location objects set
@@ -178,6 +168,12 @@ updatewObjectStates obj1 0 "The lever is upright"
 updatewObjectStates obj1 1 "The lever is pulled"
 
 (*
+
+UPDATED TO DO - 
+Need to add a checker to see if the object is in the room before checking the dictionary - maybe?
+Add option result to checkInteractionKey
+Convert to an actual program and not just a script
+
 TODO - 
 Need to add options to checkInteractionkey
 Based on options update object or not
