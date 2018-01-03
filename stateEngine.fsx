@@ -55,8 +55,8 @@ type ResultTuple = string * List<ObjectUpdateTuple>
 
 // (Command, Object ID, Specific State Number) : (Interaction Text, New State Num, New State String)
 let interactionDict = dict[
-    (Push, 1, 0), ("You have pushed the button", [(1, 3, "The button is pushed in"); (2, 3, "The lever is pulled")]);
-    (Pull, 2, 0), ("You have pulled the lever", [(2, 3, "The lever is pulled"); (1, 3, "The button is pushed in")]);
+    (Push, 1, 0), ("You have pushed the button", [(1, 4, "The button is pushed in"); (2, 4, "The lever is pulled")]);
+    (Pull, 2, 0), ("You have pulled the lever", [(2, 4, "The lever is pulled"); (1, 4, "The button is pushed in")]);
 ]
 
 // let newInteractionDict = dict[
@@ -116,7 +116,6 @@ let updateLocationObjectsSet (updateList:List<ObjectUpdateTuple>) =
   let objectsList = updateObjectStates updateList
   {currentLocation with objects = currentLocation.objects |> Set.difference(objectsList.Head) |> Set.union(objectsList.Tail.Head)}
 
-
 (*
 Checks the interaction array to see if the command can be applied to the given object
 - If it can, print out the resulting text and send back the list of object updates
@@ -138,7 +137,11 @@ let processCommand (command:Command, objectName:string) =
   | Some wObject ->
     let checkResult = checkInteractionKey (command, wObject)
     match checkResult with
-    | Some checkResult -> updateLocationObjectsSet checkResult
+    | Some checkResult -> 
+      let updatedLocation = updateLocationObjectsSet checkResult
+      match updatedLocation.objects |> Set.forall (fun elem -> elem.stateNum = 4) with
+      | true -> {updatedLocation with state = 1}
+      | false -> updatedLocation
     | _ -> currentLocation
   | None -> 
     printfn "There is no %s in your current location" objectName
@@ -154,19 +157,9 @@ currentLocation
 processCommand (Pull, "lever")
 
 (*
-
 UPDATED TO DO - 
-Need to add a checker to see if the object is in the room before checking the dictionary - maybe?
-Add option result to checkInteractionKey
 Convert to an actual program and not just a script
-
-TODO - 
-Need to add options to checkInteractionkey
-Based on options update object or not
 Figure out how we want to update items
-- Update the sets in Locaton based off of this
-  - Use the Set functions to update them and make new records
-Need to add a method of checking if every object in a location is complete, and update the location state
 
 FOR THE OTHERS TO WORK ON - 
 Need some user output methods that print out objects, items and information about rooms
