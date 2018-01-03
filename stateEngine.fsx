@@ -55,22 +55,22 @@ type ResultTuple = string * List<ObjectUpdateTuple>
 
 // (Command, Object ID, Specific State Number) : (Interaction Text, New State Num, New State String)
 let interactionDict = dict[
-    (Push, 1, 0), ("You have pushed the button", 4, "The button on the wall is pushed in");
-    (Pull, 2, 0), ("You have pulled the lever", 4, "The lever on the wall is pulled down");
+    (Push, 1, 0), ("You have pushed the button", [(1, 3, "The button is pushed in"); (2, 3, "The lever is pulled")]);
+    (Pull, 2, 0), ("You have pulled the lever", [(2, 3, "The lever is pulled"); (1, 3, "The button is pushed in")]);
 ]
 
 // let newInteractionDict = dict[
 //   (command, objId, stateOfObject), (resultTuple, [(ObjectUpdateTuple); (ObjectUpdateTuple)])
 // ]
 
-let obj1 = {id=1; name="Button"; stateNum=0; stateString="The button is untouched"}
-let obj2 = {id=2; name="Lever"; stateNum=0; stateString="The lever is upright"}
+let obj1 = {id=1; name="button"; stateNum=0; stateString="The button is untouched"}
+let obj2 = {id=2; name="lever"; stateNum=0; stateString="The lever is upright"}
 
-let item1 = {id=0; name="Dagger"}
-let item2 = {id=1; name="Sword"}
+let item1 = {id=0; name="dagger"}
+let item2 = {id=1; name="sword"}
 
 let testLoc = {
-    name = "Pyramid";
+    name = "pyramid";
     state = 0;
     items = Set.ofList [item1; item2];
     objects = Set.ofList [obj1; obj2]
@@ -92,80 +92,66 @@ let sandsOfTime = {
 let currentLocation = sandsOfTime
 // =============================================================================================
 
+(*
+  Function that updates the state of all objects objects in the room after an interaction
+  - Filters the set of objects in the room down to only those that need to be altered
+  - Combine the set of filtered objects with the list of new object stats
+  - Create a set of WorldObjects with updated stats
+  - Output a list with 2 sets, the oldObject that are to be removed from the room, and the new set of updated objects to be added
+*)
+let updateObjectStates (newObjStatsList:List<ObjectUpdateTuple>) =  
+  let sortedObjStatsList = newObjStatsList |> List.sortBy (fun (id,_,_) -> id)
+  let oldObjects = Set.filter (fun elem -> List.exists (fun (id,_,_) -> id = elem.id) sortedObjStatsList) currentLocation.objects
+  [ oldObjects; 
+    Seq.zip oldObjects sortedObjStatsList |> 
+      Seq.map (fun item -> 
+        let object, (_, newStateNum, newStateString) = item
+        {object with stateNum = newStateNum; stateString = newStateString}
+      ) |> Set.ofSeq
+  ]
 
-(* THE PLAN - 
-    Want to return a new set of objects for the current location
 
-    For each item in the list return the corresponding item from the set of objects, based on the object id
-    Create a new object record with updated stateNum and stateString - ALREADY HAVE A FUNCTION
-    Remove the old object from the set and add the new object to the set - ALREADY IN A FUNCTION, TAKE IT OUT AND ADD TO HERE
-    Return the final set after iterating through the list of updated objects ends
-  *) 
+// Update the objects set at the current location, removing the old objects and adding the updated ones
+let updateLocationObjectsSet (updateList:List<ObjectUpdateTuple>) = 
+  let objectsList = updateObjectStates updateList
+  {currentLocation with objects = currentLocation.objects |> Set.difference(objectsList.Head) |> Set.union(objectsList.Tail.Head)}
 
+
+(*
+Checks the interaction array to see if the command can be applied to the given object
+- If it can, print out the resulting text and send back the list of object updates
+- If nothing matches print error string, and return None
+*) 
+let checkInteractionKey (command:Command, wObject:WorldObject) =
+  try 
+    let outputText,matchedItem = interactionDict.Item(command, wObject.id, wObject.stateNum)
+    printfn "%A" outputText
+    Some matchedItem
+  with _ ->  
+  printfn "You cannot %A the %s" command wObject.name
+  None
+
+// Processes a user input command based on the command keyword and the object it is being applied to
+let processCommand (command:Command, objectName:string) = 
+  let wObject = currentLocation.objects |> Set.filter (fun object -> object.name = objectName) |> Set.toList |> List.tryHead
+  match wObject with
+  | Some wObject ->
+    let checkResult = checkInteractionKey (command, wObject)
+    match checkResult with
+    | Some checkResult -> updateLocationObjectsSet checkResult
+    | _ -> currentLocation
+  | None -> 
+    printfn "There is no %s in your current location" objectName
+    currentLocation
+    
   
-  // Use all these elements to generate new elements from them
-  // Remove all the old elements from the set and add the new ones to the set
-let objUpdateList = [(1, 3, "The lever is pulled"); (2, 3, "The button is pushed")]
-
-let newUpdateObjectState (newObjStatsList:List<ObjectUpdateTuple>) = 
-  let objectsToUpdate = Set.filter (fun elem -> List.exists (fun (id,_,_) -> id = elem.id) newObjStatsList) currentLocation.objects
-  let newObjects = Set.empty
-  printfn "%A" newObjStatsList
-  // How to add things to the set
-  //newObjects.Add({oldObject with stateNum = newStateNum; stateString = newStateString})
-
-
-  // Iterate through the ObjStatsList and match ids to records in the set
-  // Create a new set with new records that contain the updated stats based on the old records
-  // Delete the set of old records from the location objects set
-  // Add the set of new records to the location objects set
   
-
-newUpdateObjectState objUpdateList
-
-// Error checking for function done if error tuple is returned or not from checkInteractionKey
-let updatewObjectStates (wObject:WorldObject) (newStateNum:int) (newStateString:string) = 
-  {wObject with stateNum = newStateNum; stateString = newStateString}
-
-// Alter this to always use the current location
-let updateLocationObjectsSet (wObject:WorldObject) (locationRecord:Location) (outputText:string, newStateNum:int, newStateString:string) = 
-  let newObject = updatewObjectStates wObject newStateNum newStateString
-  {locationRecord with objects = locationRecord.objects.Remove(wObject).Add(newObject)}
-
-
-// This function is really trash - Pls refine it, maybe 2 functions nested?
-let formatInteractionAndErrorTuples (command:Command, wObject:WorldObject) =
-  let errorString = String.Format("You cannot {0} on the {1}", command, wObject.name)
-  ((command, wObject.id, wObject.stateNum), (errorString, wObject.stateNum, wObject.stateString))
-
-
-// Checks the interaction array to see if the command can be applie to the given object
-let checkInteractionKey (inputTuple:InputTuple) =
-  let keyTuple,errorTuple = formatInteractionAndErrorTuples inputTuple
-  // Need options on returning things
-  [if (interactionDict.ContainsKey keyTuple) then
-    yield interactionDict.Item(keyTuple) 
-  else 
-    yield errorTuple].Head
-// Try using filter for if then else lines
-
-
-let processCommand (command:Command, wObject:WorldObject) = 
-  updateLocationObjectsSet wObject currentLocation (checkInteractionKey (command, wObject))
 
 
 // Testing Area - Careful, messy
 
-testLoc // Location before
-processCommand (Push, obj1) // Location after
-
-updateLocationObjectsSet obj1 currentLocation (checkInteractionKey (Push, obj1))
-
-checkInteractionKey (Pull, obj2)
-checkInteractionKey (Push, obj2)
-
-updatewObjectStates obj1 0 "The lever is upright"
-updatewObjectStates obj1 1 "The lever is pulled"
+currentLocation
+processCommand (Pull, "lever")
 
 (*
 
