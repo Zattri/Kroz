@@ -43,8 +43,11 @@ type InputTuple = Command * WorldObject
 // Input Command * Object ID * Specific Object State For Interaction
 type InteractionTuple = Command * int * int
 
+// objectID * newStateNum * newStateString
+type ObjectUpdateTuple = int * int * string
+
 // Interaction Output String * New stateNum * new stateString
-type ResultTuple = string * int * string
+type ResultTuple = string * List<ObjectUpdateTuple>
 
 
 // =====================================================================================
@@ -52,83 +55,123 @@ type ResultTuple = string * int * string
 
 // (Command, Object ID, Specific State Number) : (Interaction Text, New State Num, New State String)
 let interactionDict = dict[
-    (Push, 1, 0), ("You have pushed the button", 4, "The button on the wall is pushed in");
-    (Pull, 2, 0), ("You have pulled the lever", 4, "The lever on the wall is pulled down");
+    (Push, 1, 0), ("You have pushed the button", [(1, 3, "The button is pushed in"); (2, 3, "The lever is pulled")]);
+    (Pull, 2, 0), ("You have pulled the lever", [(2, 3, "The lever is pulled"); (1, 3, "The button is pushed in")]);
 ]
 
-let obj1 = {id=1; name="Button"; stateNum=0; stateString="The button is untouched"}
-let obj2 = {id=2; name="Lever"; stateNum=0; stateString="The lever is upright"}
+// let newInteractionDict = dict[
+//   (command, objId, stateOfObject), (resultTuple, [(ObjectUpdateTuple); (ObjectUpdateTuple)])
+// ]
 
-let item1 = {id=0; name="Dagger"}
-let item2 = {id=1; name="Sword"}
+let obj1 = {id=1; name="button"; stateNum=0; stateString="The button is untouched"}
+let obj2 = {id=2; name="lever"; stateNum=0; stateString="The lever is upright"}
+
+let item1 = {id=0; name="dagger"}
+let item2 = {id=1; name="sword"}
 
 let testLoc = {
-    name = "Pyramid";
+    name = "pyramid";
     state = 0;
     items = Set.ofList [item1; item2];
     objects = Set.ofList [obj1; obj2]
 }
 
 // =============================================================================================
+// Sands of Time test room 
+let sandsOfTime = {
+  name = "Sand Room";
+  state = 0;
+  items = Set.ofList [];
+  objects = Set.ofList [obj1; obj2]
+}
 
 
-// Error checking for function done if error tuple is returned or not from checkInteractionKey
-let updatewObjectStates (wObject:WorldObject) (newStateNum:int) (newStateString:string) = 
-  {wObject with stateNum = newStateNum; stateString = newStateString}
+// =============================================================================================
 
-let updateLocationObjectsSet (wObject:WorldObject) (locationRecord:Location) (resultTuple:ResultTuple) = 
-  let (_,newStateNum,newStateString) = resultTuple
-  let newObject = updatewObjectStates wObject newStateNum newStateString
-  {locationRecord with objects = locationRecord.objects.Remove(wObject).Add(newObject)}
+// Temp Variable - Create some sort of interface that alters the current location of the player
+let currentLocation = sandsOfTime
+// =============================================================================================
 
-
-// This function is really trash - Pls refine it, maybe 2 functions nested?
-let formatInteractionAndErrorTuples (command:Command, wObject:WorldObject) =
-  let errorString = String.Format("You cannot {0} on the {1}", command, wObject.name)
-  ((command, wObject.id, wObject.stateNum), (errorString, wObject.stateNum, wObject.stateString))
-
-
-// Checks the interaction array to see if the command can be applie to the given object
-let checkInteractionKey (inputTuple:InputTuple) =
-  let tuples = formatInteractionAndErrorTuples inputTuple
-  // Need options on returning things
-  [if (interactionDict.ContainsKey (fst tuples)) then
-    yield interactionDict.Item(fst tuples) 
-  else 
-    yield (snd tuples)].Head
-// Returns a list pls fix
-// Try using filter for if then else lines
-// Also break down the tuple in the parameter input
+(*
+  Function that updates the state of all objects objects in the room after an interaction
+  - Filters the set of objects in the room down to only those that need to be altered
+  - Combine the set of filtered objects with the list of new object stats
+  - Create a set of WorldObjects with updated stats
+  - Output a list with 2 sets, the oldObject that are to be removed from the room, and the new set of updated objects to be added
+*)
+let updateObjectStates (newObjStatsList:List<ObjectUpdateTuple>) =  
+  let sortedObjStatsList = newObjStatsList |> List.sortBy (fun (id,_,_) -> id)
+  let oldObjects = Set.filter (fun elem -> List.exists (fun (id,_,_) -> id = elem.id) sortedObjStatsList) currentLocation.objects
+  [ oldObjects; 
+    Seq.zip oldObjects sortedObjStatsList |> 
+      Seq.map (fun item -> 
+        let object, (_, newStateNum, newStateString) = item
+        {object with stateNum = newStateNum; stateString = newStateString}
+      ) |> Set.ofSeq
+  ]
 
 
-// Also needs player location - testLoc needs to be where the object is located / where the player is currently (should be the same)
-// - Make a function for that?
-let processCommand (inputTuple:InputTuple) = 
-let command,wObject = inputTuple
-updateLocationObjectsSet wObject testLoc (checkInteractionKey (command, wObject))
+// Update the objects set at the current location, removing the old objects and adding the updated ones
+let updateLocationObjectsSet (updateList:List<ObjectUpdateTuple>) = 
+  let objectsList = updateObjectStates updateList
+  {currentLocation with objects = currentLocation.objects |> Set.difference(objectsList.Head) |> Set.union(objectsList.Tail.Head)}
+
+
+(*
+Checks the interaction array to see if the command can be applied to the given object
+- If it can, print out the resulting text and send back the list of object updates
+- If nothing matches print error string, and return None
+*) 
+let checkInteractionKey (command:Command, wObject:WorldObject) =
+  try 
+    let outputText,matchedItem = interactionDict.Item(command, wObject.id, wObject.stateNum)
+    printfn "%A" outputText
+    Some matchedItem
+  with _ ->  
+  printfn "You cannot %A the %s" command wObject.name
+  None
+
+// Processes a user input command based on the command keyword and the object it is being applied to
+let processCommand (command:Command, objectName:string) = 
+  let wObject = currentLocation.objects |> Set.filter (fun object -> object.name = objectName) |> Set.toList |> List.tryHead
+  match wObject with
+  | Some wObject ->
+    let checkResult = checkInteractionKey (command, wObject)
+    match checkResult with
+    | Some checkResult -> updateLocationObjectsSet checkResult
+    | _ -> currentLocation
+  | None -> 
+    printfn "There is no %s in your current location" objectName
+    currentLocation
+    
+  
+  
 
 
 // Testing Area - Careful, messy
 
-printfn "%A" testLoc // Location before
-processCommand (Push, obj1) // Location after
-
-updateLocationObjectsSet obj1 testLoc (checkInteractionKey (Push, obj1))
-
-checkInteractionKey (Pull, obj2)
-checkInteractionKey (Push, obj2)
-
-updatewObjectStates obj1 0 "The lever is upright"
-updatewObjectStates obj1 1 "The lever is pulled"
+currentLocation
+processCommand (Pull, "lever")
 
 (*
+
+UPDATED TO DO - 
+Need to add a checker to see if the object is in the room before checking the dictionary - maybe?
+Add option result to checkInteractionKey
+Convert to an actual program and not just a script
+
 TODO - 
 Need to add options to checkInteractionkey
 Based on options update object or not
 Figure out how we want to update items
 - Update the sets in Locaton based off of this
   - Use the Set functions to update them and make new records
-- Update Location state based off of whether all objects in the set are complete or not
+Need to add a method of checking if every object in a location is complete, and update the location state
+
+FOR THE OTHERS TO WORK ON - 
+Need some user output methods that print out objects, items and information about rooms
+Need some methods that interact with the user and take in input
+
 
 GG EZ
 We Gucci
