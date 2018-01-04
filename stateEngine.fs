@@ -56,9 +56,9 @@ type ResultTuple = string * List<ObjectUpdateTuple>
 // (Command, Object ID, Specific State Number) : (Interaction Text, New State Num, New State String)
 let interactionDict = dict[
   (Push, 1, 0), ("You push the button", [(1, 4, "The button is pushed in"); (2, 1, "The lever is upright")]);
-  (Pull, 2, 0), ("The lever will not move", [(2, 0, "The lever is upright")]);
+  (Pull, 2, 0), ("The lever will not move", []);
   (Pull, 2, 1), ("The lever clunks down into place and there is a 'chink' sound from the door", [(2, 4, "The lever is pulled down"); (3, 1, "The door is unlocked")])
-  (Open, 3, 0), ("The door does not move", [(3, 0, "The door is closed, it seems to be locked")]);
+  (Open, 3, 0), ("The door does not move", []);
   (Open, 3, 1), ("The door swings open", [(3, 4, "The door is open")]);
 ]
 
@@ -96,23 +96,17 @@ let mutable currentLocation = sandsOfTime
 let updateObjectStates (newObjStatsList:List<ObjectUpdateTuple>) =  
   let sortedObjStatsList = newObjStatsList |> List.sortBy (fun (id,_,_) -> id)
   let oldObjects = Set.filter (fun elem -> List.exists (fun (id,_,_) -> id = elem.id) sortedObjStatsList) currentLocation.objects
-  let returnedList = [ oldObjects; 
+  [ oldObjects; 
     Seq.zip oldObjects sortedObjStatsList |>
-      Seq.map (fun item -> 
-        let object, (_, newStateNum, newStateString) = item
+      Seq.map (fun (object, (_, newStateNum, newStateString)) -> 
         {object with stateNum = newStateNum; stateString = newStateString}
       ) |> Set.ofSeq
   ]
-  //printfn "RETURNED LIST %A" returnedList // Remove this and returnedList variable after debugging
-  returnedList
 
 
-// Update the objects set at the current location, removing the old objects and adding the updated ones
 let updateLocationObjectsSet (updateList:List<ObjectUpdateTuple>) = 
   let objectsList = updateObjectStates updateList
-  let returnedLocation = {currentLocation with objects = Set.difference currentLocation.objects objectsList.Head |> Set.union(objectsList.Tail.Head)}
-  //printfn "RETURNED LOCATION %A" returnedLocation.objects // Remove this and returnedLocation after debugging
-  returnedLocation
+  {currentLocation with objects = Set.difference currentLocation.objects objectsList.Head |> Set.union(objectsList.Tail.Head)}
 
 (*
 Checks the interaction array to see if the command can be applied to the given object
@@ -146,12 +140,15 @@ let processCommand (command:Command, objectName:string) =
     currentLocation
     
 
-// A function made specifically for 
-
 // Testing Area - Careful, messy
+// Testing function that runs through multiple inputs
 let testHarness = 
   printfn "%A" currentLocation
+  currentLocation <- processCommand (Pull, "lever")
+  printfn "%A" currentLocation
   currentLocation <- processCommand (Push, "button")
+  printfn "%A" currentLocation
+  currentLocation <- processCommand (Open, "door")
   printfn "%A" currentLocation
   currentLocation <- processCommand (Pull, "lever")
   printfn "%A" currentLocation
