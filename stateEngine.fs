@@ -133,6 +133,10 @@ let updateObjectStates (newObjStatsList:List<ObjectUpdateTuple>) =
       ) |> Set.ofSeq
   ]
 
+(*
+  Take in a list of updated objects and old object and adds the updated objects to a set, 
+  removing the old ones, and generates a new Location record from this
+*) 
 
 let updateLocationObjectsSet (updateList:List<ObjectUpdateTuple>) = 
   let objectsList = updateObjectStates updateList
@@ -152,12 +156,20 @@ let checkInteractionKey (command:Command, wObject:WorldObject) =
   printfn "You cannot %A the %s" command wObject.name
   None
 
-// Processes a user input command based on the command keyword and the object it is being applied to
+(*
+  Processes a user input command based on the command keyword and the object it is being applied to
+  Try and match the object name to an object with that name in the player's current location
+  - Else return that there is no object of that name in the current location
+  If found retrieve that object and check if there is an interaction between that object and the input command
+  - If there is apply that command to the object, and check if the location state needs to be updated
+  Update location state number if needed and return new location record
+*)
 let processCommand (command:Command, objectName:string) = 
   let wObject = currentLocation.objects |> Set.filter (fun object -> object.name = objectName) |> Set.toList |> List.tryHead
   match wObject with
   | Some wObject ->
     let checkResult = checkInteractionKey (command, wObject)
+    printfn "%A" checkResult
     match checkResult with
     | Some checkResult -> 
       let updatedLocation = updateLocationObjectsSet checkResult
@@ -212,9 +224,12 @@ let testHarness =
 
 [<EntryPoint>]
 let main argv = 
-    testHarness    
+    //testHarness    
+    processCommand (Push, "button")
     Console.ReadLine() |> ignore
     0
+
+main
 
 (*
 UPDATED TO DO - 
