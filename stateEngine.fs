@@ -133,6 +133,10 @@ let updateObjectStates (newObjStatsList:List<ObjectUpdateTuple>) =
       ) |> Set.ofSeq
   ]
 
+(*
+  Take in a list of updated objects and old object and adds the updated objects to a set, 
+  removing the old ones, and generates a new Location record from this
+*) 
 
 let updateLocationObjectsSet (updateList:List<ObjectUpdateTuple>) = 
   let objectsList = updateObjectStates updateList
@@ -152,7 +156,14 @@ let checkInteractionKey (command:Command, wObject:WorldObject) =
   printfn "You cannot %A the %s" command wObject.name
   None
 
-// Processes a user input command based on the command keyword and the object it is being applied to
+(*
+  Processes a user input command based on the command keyword and the object it is being applied to
+  Try and match the object name to an object with that name in the player's current location
+  - Else return that there is no object of that name in the current location
+  If found retrieve that object and check if there is an interaction between that object and the input command
+  - If there is apply that command to the object, and check if the location state needs to be updated
+  Update location state number if needed and return new location record
+*)
 let processCommand (command:Command, objectName:string) = 
   let wObject = currentLocation.objects |> Set.filter (fun object -> object.name = objectName) |> Set.toList |> List.tryHead
   match wObject with
@@ -179,51 +190,56 @@ let testPrintOutput location =
   printfn "%s - %d"  location.name location.state
   location.objects |> Set.iter (fun object -> printfn "%s - %d" object.name object.stateNum)
 
-let testHarness = 
-  // First room test
-  // testPrintOutput currentLocation
-  // currentLocation <- processCommand (Pull, "lever")
-  // testPrintOutput currentLocation
-  // currentLocation <- processCommand (Push, "button")
-  // testPrintOutput currentLocation
-  // currentLocation <- processCommand (Open, "door")
-  // testPrintOutput currentLocation
-  // currentLocation <- processCommand (Pull, "lever")
-  // testPrintOutput currentLocation
-  // currentLocation <- processCommand (Open, "door")
-  // testPrintOutput currentLocation
-  // Second room test
+let testHarness1 = 
+  // First test function
+  currentLocation <- entranceRoom
+  testPrintOutput currentLocation
+  currentLocation <- processCommand (Push, "button")
+  currentLocation <- processCommand (Pull, "lever")
+  currentLocation <- processCommand (Open, "door")
+  testPrintOutput currentLocation
+  printfn "" // To return unit
+
+let testHarness2 = 
+  // Second test function
   currentLocation <- tileRoom
   testPrintOutput currentLocation
   currentLocation <- processCommand (Read, "inscription")
-  testPrintOutput currentLocation
+  currentLocation <- processCommand (Push, "sun tile")
   currentLocation <- processCommand (Move, "sun tile")
-  testPrintOutput currentLocation
+  currentLocation <- processCommand (Move, "river tile")
+  currentLocation <- processCommand (Move, "sun tile")
   currentLocation <- processCommand (Move, "moon tile")
-  testPrintOutput currentLocation
   currentLocation <- processCommand (Move, "river tile")
   testPrintOutput currentLocation
-  // currentLocation <- processCommand (Move, "sun tile")
-  // testPrintOutput currentLocation
-  // currentLocation <- processCommand (Move, "sun tile")
-  // testPrintOutput currentLocation
-  // currentLocation <- processCommand (Move, "sun tile")
-  // testPrintOutput currentLocation
+  printfn "" // To return unit
+
+let testHarness3 = 
+  // Third test function
+  currentLocation <- tileRoom
+  testPrintOutput currentLocation
+  currentLocation <- processCommand (Read, "enscribtion")
+  currentLocation <- processCommand (Push, "enscribtion")
+  currentLocation <- processCommand (Read, "inscription")
+  currentLocation <- processCommand (Push, "sun tile")
+  currentLocation <- processCommand (Move, "sun tile")
+  currentLocation <- processCommand (Pull, "river tile")
+  currentLocation <- processCommand (Move, "river tile")
+  currentLocation <- processCommand (Move, "moon tile")
+  currentLocation <- processCommand (Move, "moon tile")
+  currentLocation <- processCommand (Move, "sun tile")
+  currentLocation <- processCommand (Move, "moon tile")
+  currentLocation <- processCommand (Move, "river tile")
+  testPrintOutput currentLocation
+  printfn "" // To return unit
 
 [<EntryPoint>]
 let main argv = 
-    testHarness    
-    Console.ReadLine() |> ignore
-    0
+  testHarness1
+  Console.ReadLine() |> ignore
+  0
 
 (*
-UPDATED TO DO - 
-Figure out how we want to update items
-
-FOR THE OTHERS TO WORK ON - 
-Need some user output methods that print out objects, items and information about rooms
-Need some methods that interact with the user and take in input
-
 
 GG EZ
 We Gucci
