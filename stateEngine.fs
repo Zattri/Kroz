@@ -87,11 +87,6 @@ let moonTile = {id=5; name="moon tile"; stateNum=0; stateString="The moon tile i
 let riverTile = {id=6; name="river tile"; stateNum=0; stateString="The river tile is towards the bottom of the wall";}
 let inscription = {id=7; name="inscription"; stateNum=4; stateString="The inscription reads 'The moon raises the river at the end of the day'";}
 
-// Template - {id= ; name=""; stateNum=0; stateString="";}
-
-let item1 = {id=0; name="dagger"}
-let item2 = {id=1; name="sword"}
-
 
 // =============================================================================================
 // Test Rooms
@@ -181,7 +176,8 @@ let processCommand (command:Command, objectName:string) =
     currentLocation
     
 
-// Testing Area - Careful, messy
+// Testing Functions ================================================================
+
 // Testing function that runs through multiple inputs
 
 let testPrintOutput location = 
@@ -198,7 +194,6 @@ let testHarness1 =
   currentLocation <- processCommand (Pull, "lever")
   currentLocation <- processCommand (Open, "door")
   testPrintOutput currentLocation
-  printfn "" // To return unit
 
 let testHarness2 = 
   // Second test function
@@ -212,7 +207,6 @@ let testHarness2 =
   currentLocation <- processCommand (Move, "moon tile")
   currentLocation <- processCommand (Move, "river tile")
   testPrintOutput currentLocation
-  printfn "" // To return unit
 
 let testHarness3 = 
   // Third test function
@@ -231,16 +225,11 @@ let testHarness3 =
   currentLocation <- processCommand (Move, "moon tile")
   currentLocation <- processCommand (Move, "river tile")
   testPrintOutput currentLocation
-  printfn "" // To return unit
 
 [<EntryPoint>]
 let main argv = 
   testHarness1
+  testHarness2
+  testHarness3
   Console.ReadLine() |> ignore
   0
-
-(*
-
-GG EZ
-We Gucci
-*)
