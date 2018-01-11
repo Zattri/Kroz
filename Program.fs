@@ -4,7 +4,7 @@
 
 open System
 open System.Text.RegularExpressions
-//Some of these types are EXAMPLES and are to be replaced later on. These are clearly marked.
+
 
 type Item =
   {

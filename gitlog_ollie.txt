@@ -1,0 +1,246 @@
+commit f50a26bb5d580b9776a1240b9429b6e9c6d3b194
+Author: Zattri <daninjakidy@gmail.com>
+Date:   Wed Jan 10 22:18:35 2018 +0000
+
+    Combined code bases
+
+
+commit 65f65f6c14125a329de91dc747dd23891214b190
+Author: Zattri <daninjakidy@gmail.com>
+Date:   Tue Jan 9 21:58:09 2018 +0000
+
+    Added test harnesses
+
+
+commit 8a2e2e705c53249966ba4d4f58c14a7b03a53c78
+Author: Zattri <daninjakidy@gmail.com>
+Date:   Tue Jan 9 17:54:23 2018 +0000
+
+    Starting testing
+
+
+commit 863e862406b5776246d1e1ba4eaf162a2f1bdaae
+Author: Zattri <daninjakidy@gmail.com>
+Date:   Sat Jan 6 23:39:00 2018 +0000
+
+    Finished the automated testing function and added 2 rooms
+
+
+commit 6911b9a0d4a4994ec39b47cb86f06a7a345c07a4
+Author: Zattri <daninjakidy@gmail.com>
+Date:   Thu Jan 4 17:29:12 2018 +0000
+
+    Finished making changes to stateEngine for now, implemented automated testing function
+
+
+commit 4f6fda38d7c63f5bc3adf1f90dac345b6d654cef
+Author: Zattri <daninjakidy@gmail.com>
+Date:   Thu Jan 4 13:34:16 2018 +0000
+
+    Converting to FSharp program
+
+
+commit 978da30588722b3ba81f26afcd3ab8f07ea02d77
+Author: Zattri <daninjakidy@gmail.com>
+Date:   Wed Jan 3 21:58:17 2018 +0000
+
+    Implemented location state updates if all objects in the location are completed
+
+
+commit 22ac5470fc9a3051411908a67e332819579e1911
+Author: Zattri <daninjakidy@gmail.com>
+Date:   Wed Jan 3 16:46:24 2018 +0000
+
+    Finished implementing all state engine requirements, starting to make puzzles now
+
+
+commit d016c95f9c6a298e7acf15a3d4ad87d43b6015c2
+Author: Zattri <daninjakidy@gmail.com>
+Date:   Mon Jan 1 15:01:20 2018 +0000
+
+    Added some more comments and cleared up a few comments
+
+
+commit 16b310560e6d19521acbc8bb531c2c859596b1c3
+Author: Zattri <daninjakidy@gmail.com>
+Date:   Wed Dec 27 19:56:05 2017 +0000
+
+    Tried to implement being able to alter more than 1 objects state
+
+
+commit f186e36b942041d4f1520cdf2e3bce97bbc0fd43
+Author: Zattri <daninjakidy@gmail.com>
+Date:   Sun Dec 17 23:47:09 2017 +0000
+
+    Did some minor refactors and added some comments
+
+
+commit c8ad8fd251ad9d7fe7c5f59b4885d04aee392fc9Merge: 1ab9233 071bb8e
+Author: Zattri <daninjakidy@gmail.com>
+Date:   Fri Dec 15 20:11:09 2017 +0000
+
+    Added notes from Emmett
+
+
+commit 071bb8ecfe394d8054bab3cf2e8c13ef1a7f00c4
+Author: Zattri <daninjakidy@gmail.com>
+Date:   Tue Dec 12 17:51:16 2017 +0000
+
+    Added some comments from Emmett on what to do
+
+
+commit 1ab9233204cb95e0c96eaa0477acaca287b2f4c4
+Author: Zattri <daninjakidy@gmail.com>
+Date:   Mon Dec 11 18:14:21 2017 +0000
+
+    Added some more problems and tidied up comments a bit
+
+
+commit 188d25f97e69e61c43b04cd95d600882038e767cMerge: b70c8c6 9940c74
+Author: Ollie Favell <Zattri@users.noreply.github.com>
+Date:   Mon Dec 11 18:10:49 2017 +0000
+
+    Merge pull request #7 from Zattri/ollie
+    
+    Added in updating location objects set
+
+
+commit 9940c74a62416befaa6305cc3bea4e4ff9b6c584
+Author: Zattri <daninjakidy@gmail.com>
+Date:   Mon Dec 11 18:08:02 2017 +0000
+
+    Added in updating location objects set
+
+
+commit b70c8c67636943c06dcbaa3a8d18e7bfb9360230Merge: 8d0465f 22c20c7
+Author: Ollie Favell <Zattri@users.noreply.github.com>
+Date:   Mon Dec 11 00:45:00 2017 +0000
+
+    Merge pull request #6 from Zattri/ollie
+    
+    Ollie
+
+
+commit 22c20c722a802a3b5d0de289d15b0e5a2824cc1a
+Author: Zattri <daninjakidy@gmail.com>
+Date:   Mon Dec 11 00:04:54 2017 +0000
+
+    Finished most of the planning diagrams, need descriptions for some more details, added new problems
+
+
+commit 5cac3a3b3404ba993dd7ee214050cfafb09bcc8e
+Author: Zattri <daninjakidy@gmail.com>
+Date:   Sun Dec 10 20:39:12 2017 +0000
+
+    Added some more planning, need to figure out items and how they will be removed
+
+
+commit 8d0465faea186fe5b1625b5b1909ef5adb7c7e3d
+Merge: 97ea3a1 db60d34
+Author: Ollie Favell <Zattri@users.noreply.github.com>
+Date:   Sat Dec 9 19:23:12 2017 +0000
+
+    Merge pull request #5 from Zattri/ollie
+    
+    Added some more notes on planning and some new potential problems
+
+
+commit db60d3461c46c61bc10a8f0191677ad8319c451e
+Author: Zattri <daninjakidy@gmail.com>
+Date:   Sat Dec 9 19:18:42 2017 +0000
+
+    Added some more notes on planning and some new potential problems
+
+
+commit 97ea3a1957014efe4a7520f00b00a4448ef8bbb3Merge: 2b0dfdd f6a1b94
+Author: Ollie Favell <Zattri@users.noreply.github.com>
+Date:   Sat Dec 9 16:32:50 2017 +0000
+
+    Merge pull request #4 from Zattri/ollie
+    
+    Untracked temp files
+
+
+commit f6a1b941efdb6192fa6cf3b9144d32671f8379dd
+Author: Zattri <daninjakidy@gmail.com>
+Date:   Sat Dec 9 16:32:13 2017 +0000
+
+    Untracked temp files
+
+
+commit 2b0dfddce1b50d51a28af779b8ff96c1c5658555
+Merge: 7532988 5efd8ea
+Author: Ollie Favell <Zattri@users.noreply.github.com>
+Date:   Sat Dec 9 16:31:18 2017 +0000
+
+    Merge pull request #3 from Zattri/ollie
+    
+    Worked on checking the interactions dictionary and made a problems file
+
+
+commit 5efd8eaa5838a495c1f01b707e427fccd8aa0553
+Author: Zattri <daninjakidy@gmail.com>
+Date:   Sat Dec 9 16:30:39 2017 +0000
+
+    Worked on checking the interactions dictionary and made a problems file
+
+
+commit 7532988bc6026239881cf1957ba8a49778a06210
+Author: Ollie Favell <Zattri@users.noreply.github.com>
+Date:   Fri Dec 8 17:16:30 2017 +0000
+
+    Test file after lab changes
+
+
+commit ff8d358e85224463a00a2bcdc5b3111f30bfe7ad
+Author: Ollie Favell <Zattri@users.noreply.github.com>
+Date:   Fri Dec 8 14:53:42 2017 +0000
+
+    Ollie Test File Upload
+
+
+commit cb5516ae6fa68d3304a4582b9d8d3311b6de4f9c
+Author: Zattri <daninjakidy@gmail.com>
+Date:   Tue Dec 5 16:31:02 2017 +0000
+
+    Deleted testing files
+
+
+commit 2e004bab0f303727bdf84abd5cdb099207b4c5dcMerge: 775d8ff b8f5cb5
+Author: Ollie Favell <Zattri@users.noreply.github.com>
+Date:   Tue Dec 5 16:27:52 2017 +0000
+
+    Merge pull request #2 from Zattri/reeceydoodle
+    
+    lol
+
+
+commit b8f5cb568219c9b42dc149d6c3a24a6a58f0f0b6
+Author: Zattri <daninjakidy@gmail.com>
+Date:   Tue Dec 5 16:25:09 2017 +0000
+
+    lol
+
+
+commit 775d8ff946cadace04ea75c2c3a78de216d2a4fb
+Merge: 1df9fec 7f69871
+Author: Ollie Favell <Zattri@users.noreply.github.com>
+Date:   Tue Dec 5 16:18:39 2017 +0000
+
+    Merge pull request #1 from Zattri/test
+    
+    Uploaded spoon file
+
+
+commit 7f69871a757323fef28b60a5f6dfe860205203e9
+Author: Zattri <daninjakidy@gmail.com>
+Date:   Tue Dec 5 16:15:34 2017 +0000
+
+    Uploaded spoon file
+
+
+commit 1df9fec223028aa5d8e7ceb674199a7e6fbcb7a8
+Author: Ollie Favell <Zattri@users.noreply.github.com>
+Date:   Tue Dec 5 16:03:37 2017 +0000
+
+    Initial commit
