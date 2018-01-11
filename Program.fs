@@ -1,4 +1,4 @@
-//Todo: Get user input and match it against the list of commands.
+﻿//Todo: Get user input and match it against the list of commands.
 //Todo: Match commands with items and objects, restrict what can happen.
 //Todo: Pass this over to the game engine.
 
@@ -238,6 +238,7 @@ let interactionDict = dict[
   (Pull, 2, 1), ("You pull the lever and as it slides down into place you hear a 'chink' sound from the door", [(2, 4, "The lever is pulled down"); (3, 1, "The door is unlocked")])
   (Open, 3, 0), ("You try the door, it does not move", []);
   (Open, 3, 1), ("You push door and it swings open", [(3, 4, "The door is open")]);
+  (Close, 3, 4), ( "You pull the door and it closes softly", [(3, 1, "The door is now closed")]);
   // Tile room puzzle interactions
   (Read, 7, 4), ("You read the inscription, it says 'The moon raises the river at the end of the day'", [])
   (Move, 4, 0), ("You move the sun tile to the middle of the wall, but the moon and river tiles slide back", [(4, 1, "The sun tile is aligned in the middle of the wall"); (5, 2, "The moon tile is on the right side of the wall"); (6, 0, "The river tile is towards the bottom of the wall")])
@@ -447,7 +448,7 @@ let testPrintOutput location =
   printfn "Name     State"
   printfn "%s - %d"  location.name location.state
   location.objects |> Set.iter (fun object -> printfn "%s - %d" object.name object.stateNum)
-
+  
 let testHarness1 = 
   // First test function
   currentLocation <- entranceRoom
@@ -455,8 +456,9 @@ let testHarness1 =
   currentLocation <- processCommand (Push, "button")
   currentLocation <- processCommand (Pull, "lever")
   currentLocation <- processCommand (Open, "door")
+  currentLocation <- processCommand (Close, "door")
   testPrintOutput currentLocation
-
+(*
 let testHarness2 = 
   // Second test function
   currentLocation <- tileRoom
@@ -486,7 +488,7 @@ let testHarness3 =
   currentLocation <- processCommand (Move, "sun tile")
   currentLocation <- processCommand (Move, "moon tile")
   currentLocation <- processCommand (Move, "river tile")
-  testPrintOutput currentLocation
+  testPrintOutput currentLocation *)
   
 // =============================================================================================
 
